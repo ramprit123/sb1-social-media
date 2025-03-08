@@ -6,35 +6,69 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
+  ActivityIndicator,
+  Image,
 } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginScreen() {
+  const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { signIn } = useAuth();
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      setError('All fields are required');
+      return;
+    }
+
+    if (!email.includes('@')) {
+      setError('Please enter a valid email');
+      return;
+    }
+
     try {
+      setIsLoading(true);
       setError('');
       await signIn(email, password);
       router.replace('/(tabs)');
     } catch (err) {
       setError('Invalid email or password');
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        <Image
+          source={require('@/assets/images/favicon.png')}
+          style={styles.logo}
+          resizeMode="contain"
+          accessibilityLabel="App logo"
+        />
         <Text style={styles.title}>Welcome Back</Text>
         <Text style={styles.subtitle}>Sign in to continue</Text>
       </View>
 
       <View style={styles.form}>
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+        {error ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.error}>{error}</Text>
+          </View>
+        ) : null}
 
         <TextInput
           style={styles.input}
@@ -43,6 +77,10 @@ export default function LoginScreen() {
           onChangeText={setEmail}
           autoCapitalize="none"
           keyboardType="email-address"
+          autoComplete="email"
+          textContentType="emailAddress"
+          returnKeyType="next"
+          accessibilityLabel="Email input"
         />
 
         <TextInput
@@ -51,10 +89,23 @@ export default function LoginScreen() {
           value={password}
           onChangeText={setPassword}
           secureTextEntry
+          autoComplete="password"
+          textContentType="password"
+          returnKeyType="done"
+          accessibilityLabel="Password input"
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Sign In</Text>
+        <TouchableOpacity
+          style={[styles.button, isLoading && styles.buttonDisabled]}
+          onPress={handleLogin}
+          disabled={isLoading}
+          accessibilityLabel="Sign in button"
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Sign In</Text>
+          )}
         </TouchableOpacity>
 
         <Link href="/forgot-password" style={styles.forgotPassword}>
@@ -67,6 +118,10 @@ export default function LoginScreen() {
             <Text style={styles.linkText}>Sign Up</Text>
           </Link>
         </View>
+
+        <Link href="/privacy" style={styles.privacyLink}>
+          <Text style={styles.privacyText}>Privacy Policy</Text>
+        </Link>
       </View>
     </View>
   );
@@ -81,6 +136,7 @@ const styles = StyleSheet.create({
   header: {
     marginTop: Platform.OS === 'ios' ? 100 : 60,
     marginBottom: 40,
+    alignItems: 'center',
   },
   title: {
     fontSize: 32,
@@ -116,10 +172,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter_600SemiBold',
   },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+  centered: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    marginBottom: 16,
+  },
   error: {
     color: '#FF3B30',
     fontSize: 14,
     fontFamily: 'Inter_400Regular',
+  },
+  logo: {
+    width: 100,
+    height: 100,
   },
   forgotPassword: {
     alignSelf: 'center',
@@ -147,5 +217,12 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     fontSize: 14,
     fontFamily: 'Inter_600SemiBold',
+  },
+  privacyLink: {
+    marginTop: 16,
+    alignSelf: 'center',
+  },
+  privacyText: {
+    color: '#666',
   },
 });

@@ -1,9 +1,28 @@
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  FlatListProps,
+} from 'react-native';
 import { Heart, MessageCircle, Share } from 'lucide-react-native';
+interface Post {
+  id: number;
+  user: {
+    avatar: string;
+    name: string;
+  };
+  content: string;
+  image?: string; // Optional image
+  likes: number;
+  comments: number;
+}
 
-const DUMMY_POSTS = [
+const DUMMY_POSTS: Post[] = [
   {
-    id: '1',
+    id: 1,
     user: {
       name: 'Sarah Wilson',
       avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
@@ -14,7 +33,7 @@ const DUMMY_POSTS = [
     comments: 24,
   },
   {
-    id: '2',
+    id: 2,
     user: {
       name: 'Michael Chen',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d',
@@ -27,30 +46,30 @@ const DUMMY_POSTS = [
 ];
 
 export default function HomeScreen() {
-  const renderPost = ({ item }) => (
+  const renderPost = ({ item }: { item: Post }) => (
     <View style={styles.postContainer}>
       <View style={styles.postHeader}>
         <Image source={{ uri: item.user.avatar }} style={styles.avatar} />
         <Text style={styles.userName}>{item.user.name}</Text>
       </View>
-      
+
       <Text style={styles.content}>{item.content}</Text>
-      
+
       {item.image && (
         <Image source={{ uri: item.image }} style={styles.postImage} />
       )}
-      
+
       <View style={styles.actions}>
         <TouchableOpacity style={styles.actionButton}>
           <Heart size={20} color="#666" />
           <Text style={styles.actionText}>{item.likes}</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.actionButton}>
           <MessageCircle size={20} color="#666" />
           <Text style={styles.actionText}>{item.comments}</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.actionButton}>
           <Share size={20} color="#666" />
         </TouchableOpacity>
@@ -60,10 +79,10 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <FlatList
+      <FlatList<Post>
         data={DUMMY_POSTS}
         renderItem={renderPost}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
       />
     </View>

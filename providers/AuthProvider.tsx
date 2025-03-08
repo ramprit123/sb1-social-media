@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Session } from '@supabase/supabase-js';
+import { useRouter, useSegments } from 'expo-router';
 
 export const AuthContext = createContext<{
   session: Session | null;
@@ -16,6 +17,18 @@ export const AuthContext = createContext<{
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    const isAuthGroup = segments[0] === '(auth)';
+
+    if (!session && !isAuthGroup) {
+      router.replace('/login');
+    } else if (session && isAuthGroup) {
+      router.replace('/(tabs)');
+    }
+  }, [session, segments]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
