@@ -166,6 +166,7 @@ const styles = StyleSheet.create({
   header: {
     marginTop: Platform.OS === 'ios' ? 100 : 60,
     marginBottom: 40,
+    alignItems: 'center',
   },
   title: {
     fontSize: 32,
