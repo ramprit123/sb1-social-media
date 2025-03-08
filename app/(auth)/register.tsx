@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+} from 'react-native';
 import { Link, router } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -13,7 +20,7 @@ export default function RegisterScreen() {
   const handleRegister = async () => {
     try {
       setError('');
-      
+
       if (password !== confirmPassword) {
         setError('Passwords do not match');
         return;

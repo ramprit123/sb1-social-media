@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Chrome as Home, Search, Bell, Bookmark, User } from 'lucide-react-native';
+import { Home, Search, Bell, Bookmark, User } from 'lucide-react-native';
 import { Platform, View } from 'react-native';
 
 export default function TabLayout() {
@@ -30,11 +30,8 @@ export default function TabLayout() {
               padding: 0,
             },
           }),
-          // Disable press effect on Android
-          tabBarPressColor: 'transparent',
-          // Remove opacity animation on press
-          tabBarPressOpacity: 1,
-        }}>
+        }}
+      >
         <Tabs.Screen
           name="index"
           options={{
@@ -46,7 +43,9 @@ export default function TabLayout() {
           name="search"
           options={{
             title: 'Search',
-            tabBarIcon: ({ color, size }) => <Search size={size} color={color} />,
+            tabBarIcon: ({ color, size }) => (
+              <Search size={size} color={color} />
+            ),
           }}
         />
         <Tabs.Screen
@@ -60,7 +59,9 @@ export default function TabLayout() {
           name="bookmarks"
           options={{
             title: 'Bookmarks',
-            tabBarIcon: ({ color, size }) => <Bookmark size={size} color={color} />,
+            tabBarIcon: ({ color, size }) => (
+              <Bookmark size={size} color={color} />
+            ),
           }}
         />
         <Tabs.Screen
