@@ -22,34 +22,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const isAuthGroup = segments[0] === '(auth)';
+    const isProtectedRoute = !isAuthGroup;
 
-    if (!session && !isAuthGroup) {
+    // Handle navigation based on auth state
+    if (!session && isProtectedRoute) {
       router.replace('/login');
     } else if (session && isAuthGroup) {
-      router.replace('/(tabs)');
+      router.replace('/');
     }
-  }, [session, segments]);
+  }, [session, segments, router]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
+    // Initialize session on mount
+    const initSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+      } catch (error) {
+        console.error('Error getting session:', error);
+      }
+    };
 
+    initSession();
+
+    // Subscribe to auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
 
+    // Cleanup subscription on unmount
     return () => subscription.unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error signing in:', error);
+      throw error;
+    }
   };
 
   const signUp = async (email: string, password: string) => {

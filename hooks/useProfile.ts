@@ -22,7 +22,7 @@ export function useProfile() {
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', session.user.id)
+          .eq('id', session?.user?.id)
           .single();
 
         if (error) throw error;
